@@ -4,33 +4,45 @@
 const puppeteer = require('puppeteer');
 
 const isDebugging = () => {
-    const debugging_mode = {
-        headless: false,
-        slowMo: 250,
-        devtools: true,
-    };
-    return process.env.NODE_ENV === 'debug' ? debugging_mode : {};
+  const debugging_mode = {
+      headless: false,
+      slowMo: 250,
+      devtools: true,
+  };
+  return process.env.NODE_ENV === 'debug' ? debugging_mode : {};
 }
 
+let browser;
+let page;
+beforeAll(async () => {
+  browser = await puppeteer.launch(isDebugging());
+  page = await browser.newPage();
+  await page.goto('http://localhost:3000/');
+  page.setViewport({width: 500, height: 1500});
+});
+
 describe('on page load', () => {
-    test('h1 loads correctly', async () => {
-        let browser = await puppeteer.launch(isDebugging());
-        let page = await browser.newPage();
+  test('h1 loads correctly', async () => {
 
-        page.emulate({
-            viewport: {
-                width: 500,
-                height: 1500,
-            },
-            userAgent: '',
-        });
+    const html = await page.$eval('[data-testid="h1"]', e => e.innerHTML);
 
-        await page.goto('http://localhost:3000/');
+    expect(html).toBe('Welcome to React');
 
-        const html = await page.$eval('.App-title', e => e.innerHTML);
+  }, 16000);
 
-        expect(html).toBe('Welcome to React');
+  test('nav loads correctly', async () => {
 
-        browser.close();
-    }, 16000);
+    const navbar = await page.$eval('[data-testid="navbar"]', el => el ? true: false);
+    const listItems = await page.$$('[data-testid="navBarLi"]');
+    
+    expect(navbar).toBeTruthy();
+    expect(listItems.length).toBe(4);
+  })
+
+});
+
+afterAll(() => {
+  if (isDebugging){
+    browser.close();
+  }
 });
