@@ -3,6 +3,8 @@
  */
 const puppeteer = require('puppeteer');
 const faker = require('faker');
+const devices = require('puppeteer/DeviceDescriptors');
+const iPhone = devices['iPhone 6'];
 
 const user = {
   email: faker.internet.email(),
@@ -47,7 +49,7 @@ describe('on page load', () => {
     expect(listItems.length).toBe(4);
   });
 
-  test('login form works correctly', async () => {
+  test('login form works correctly (browser)', async () => {
     await page.click('[data-testid="firstName"]');
     await page.type('[data-testid="firstName"]', user.firstName);
 
@@ -63,6 +65,34 @@ describe('on page load', () => {
     await page.click('[data-testid="submit"]');
 
     await page.waitForSelector('[data-testid="success"]');
+  }, 16000);
+
+  test('login form works correctly (iPhone)', async () => {
+    const page2 = await browser.newPage();
+    await page2.emulate(iPhone);
+    await page2.goto('http://localhost:3000/');
+    
+    const firstName = await page2.$('[data-testid="firstName"]');
+    const lastName = await page2.$('[data-testid="lastName"]');
+    const email = await page2.$('[data-testid="email"]');
+    const password = await page2.$('[data-testid="password"]');
+    const submit = await page2.$('[data-testid="submit"]');
+
+    await firstName.tap();
+    await page2.type('[data-testid="firstName"]', user.firstName);
+
+    await lastName.tap();
+    await page2.type('[data-testid="lastName"]', user.lastName);
+
+    await email.tap();
+    await page2.type('[data-testid="email"]', user.email);
+
+    await password.tap();
+    await page2.type('[data-testid="password"]', user.password);
+
+    await submit.tap();
+
+    await page2.waitForSelector('[data-testid="success"]');
   }, 16000);
 });
 
