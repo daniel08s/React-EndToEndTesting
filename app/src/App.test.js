@@ -49,51 +49,40 @@ describe('on page load', () => {
     expect(listItems.length).toBe(4);
   });
 
-  test('login form works correctly (browser)', async () => {
-    await page.click('[data-testid="firstName"]');
-    await page.type('[data-testid="firstName"]', user.firstName);
+  describe('login form', () => {
+    test('fills out form and submits', async () => {
+      await page.setCookie({name: 'JWT', value: 'mycookie'});
 
-    await page.click('[data-testid="lastName"]');
-    await page.type('[data-testid="lastName"]', user.lastName);
+      const firstName = await page.$('[data-testid="firstName"]');
+      const lastName = await page.$('[data-testid="lastName"]');
+      const email = await page.$('[data-testid="email"]');
+      const password = await page.$('[data-testid="password"]');
+      const submit = await page.$('[data-testid="submit"]');
 
-    await page.click('[data-testid="email"]');
-    await page.type('[data-testid="email"]', user.email);
+      await firstName.tap();
+      await page.type('[data-testid="firstName"]', user.firstName);
 
-    await page.click('[data-testid="password"]');
-    await page.type('[data-testid="password"]', user.password);
+      await lastName.tap();
+      await page.type('[data-testid="lastName"]', user.lastName);
 
-    await page.click('[data-testid="submit"]');
+      await email.tap();
+      await page.type('[data-testid="email"]', user.email);
 
-    await page.waitForSelector('[data-testid="success"]');
-  }, 16000);
+      await password.tap();
+      await page.type('[data-testid="password"]', user.password);
 
-  test('login form works correctly (iPhone)', async () => {
-    const page2 = await browser.newPage();
-    await page2.emulate(iPhone);
-    await page2.goto('http://localhost:3000/');
-    
-    const firstName = await page2.$('[data-testid="firstName"]');
-    const lastName = await page2.$('[data-testid="lastName"]');
-    const email = await page2.$('[data-testid="email"]');
-    const password = await page2.$('[data-testid="password"]');
-    const submit = await page2.$('[data-testid="submit"]');
+      await submit.tap();
 
-    await firstName.tap();
-    await page2.type('[data-testid="firstName"]', user.firstName);
+      await page.waitForSelector('[data-testid="success"]');
+    }, 16000);
 
-    await lastName.tap();
-    await page2.type('[data-testid="lastName"]', user.lastName);
+    test('sets firstName cookie', async () => {
+      const cookies = await page.cookies();
+      const firstNameCookie = cookies.find(c => c.name === 'firstName' && c.value === user.firstName);
 
-    await email.tap();
-    await page2.type('[data-testid="email"]', user.email);
-
-    await password.tap();
-    await page2.type('[data-testid="password"]', user.password);
-
-    await submit.tap();
-
-    await page2.waitForSelector('[data-testid="success"]');
-  }, 16000);
+      expect(firstNameCookie).not.toBeUndefined();
+    });
+  });
 });
 
 afterAll(() => {
