@@ -9,7 +9,7 @@ export default function Success() {
         <div className="box" />
         <div className="check" />
       </div>
-      <h3 data-testid="success" className='success'>Success!</h3>
+      <h3 data-testid="success" className="success">Success!</h3>
     </div>
   );
-};
+}
