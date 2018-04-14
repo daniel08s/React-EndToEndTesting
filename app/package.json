@@ -15,7 +15,6 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.3",
     "cross-env": "^5.1.4",
     "eslint": "^4.9.0",
     "eslint-config-airbnb": "^16.1.0",

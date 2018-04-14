@@ -17,7 +17,7 @@ const user = {
 const isDebugging = () => {
   const debugging_mode = {
     headless: false,
-    slowMo: 50,
+    slowMo: 35,
     devtools: true,
   };
   return process.env.NODE_ENV === 'debug' ? debugging_mode : {};
@@ -25,13 +25,16 @@ const isDebugging = () => {
 
 let browser;
 let page;
+const logs = [];
+const errors = [];
 
 beforeAll(async() => {
   browser = await puppeteer.launch(isDebugging());
   page = await browser.newPage();
-  await page.emulate(iPhone);
+  page.on('console', c => logs.push(c._text));
+  page.on('pageerror', e => errors.push(e.text));
   await page.goto('http://localhost:3000/');
-  page.setViewport({width: 500, height: 1500});
+  await page.emulate(iPhone);
 });
 
 describe('on page load', () => {
@@ -82,6 +85,19 @@ describe('on page load', () => {
 
       expect(firstNameCookie).not.toBeUndefined();
     });
+  });
+
+  test('does not have console logs', () => {
+    const filters = [
+      '%cDownload the React DevTools for a better development experience: https://fb.me/react-devtools font-weight:bold',
+    ];
+    const newLogs = logs.filter(log => filters.indexOf(log) === -1);
+
+    expect(newLogs.length).toBe(0);
+  });
+
+  test('does not have exceptions', () => {
+    expect(errors.length).toBe(0);
   });
 });
 

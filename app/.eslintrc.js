@@ -37,5 +37,8 @@ module.exports = {
     }],
     "no-confusing-arrow": "off",
     "jsx-a11y/anchor-has-content": ["error"],
+    "jsx-a11y/no-redundant-roles": ["error", {
+      nav: ['navigation'],
+    }],
   }
 };

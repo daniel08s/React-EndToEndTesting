@@ -23,6 +23,7 @@ class App extends Component {
     this.setState({firstName: e.currentTarget.value});
   };
 
+  /*eslint-disable */
   render() {
     return (
       <div className="App">
@@ -33,7 +34,7 @@ class App extends Component {
             <li data-testid='navBarLi' className='nav-li'><a href="#">Home</a></li>
             <li data-testid='navBarLi' className='nav-li'><a href="#">About</a></li>
             <li data-testid='navBarLi' className='nav-li'><a href="#">Skills</a></li>
-            <li data-testid='navBarLi' className='nav-li'><a href="#">Works</a></li>
+            <li data-testid='navBarLi' className='nav-li'><a href="#">Works</a></li> 
           </nav>
         </header>
         <p className="App-intro">
@@ -46,6 +47,7 @@ class App extends Component {
         }
       </div>
     );
+    /*eslint-enable */
   }
 }
 
