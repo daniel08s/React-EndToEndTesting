@@ -9,14 +9,21 @@ class App extends Component {
   state = {
     complete: false,
     firstName: '',
+    starWars: {},
   };
+
+async componentDidMount() {
+  const data = await fetch('https://swapi.co/api/people/1/')
+    .then(res => res.json());
+  this.setState({starWars: data});
+}
 
   handleSubmit = (e) => {
     e.preventDefault();
     if (document.cookie.includes('JWT')) {
       this.setState({complete: true});
     }
-    document.cookie = `firstName=${this.state.firstName}`
+    document.cookie = `firstName=${this.state.firstName}`;
   };
 
   handleInput = (e) => {
@@ -40,6 +47,7 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
+        <h3 data-testid="starWars">{this.state.starWars.url ? 'Received Star Wars data!' : 'Something went wrong!'}</h3>
         {
           this.state.complete ?
           <SuccessMessage />

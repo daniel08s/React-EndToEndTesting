@@ -31,8 +31,16 @@ const errors = [];
 beforeAll(async() => {
   browser = await puppeteer.launch(isDebugging());
   page = await browser.newPage();
-  page.on('console', c => logs.push(c._text));
-  page.on('pageerror', e => errors.push(e.text));
+  await page.setRequestInterception(true);
+  page.on('request', interceptedRequest => {
+    if(interceptedRequest.url().includes('https://swapi.co/api/')){
+      interceptedRequest.abort();
+    } else {
+      interceptedRequest.continue();
+    }
+  });
+  page.on('console', c => logs.push(c.text()));
+  page.on('pageerror', e => errors.push(e.message));
   await page.goto('http://localhost:3000/');
   await page.emulate(iPhone);
 });
@@ -49,6 +57,23 @@ describe('on page load', () => {
     const listItems = await page.$$('[data-testid="navBarLi"]');
 
     expect(navbar).toBeTruthy();
+    /*
+    if (listItems.length !== 3) {
+      await page.screenshot({
+        path: 'screenshot.png',
+        // fullPage: bool,
+        // quality: 1-100,
+        // clip: {},
+      });
+      await page.pdf({
+        path: 'screenshot.pdf',
+        // scale: number,
+        // format: string,
+        // margin: object,
+      })
+    }
+    expect(listItems.length).toBe(3);
+    //*/
     expect(listItems.length).toBe(4);
   });
 
@@ -96,8 +121,13 @@ describe('on page load', () => {
     expect(newLogs.length).toBe(0);
   });
 
-  test('does not have exceptions', () => {
+  test.skip('does not have exceptions', () => {
     expect(errors.length).toBe(0);
+  });
+
+  test('fails to fetch starWars endpoint', async () => {
+    const h3 = await page.$eval('[data-testid="starWars"]', e => e.innerHTML);
+    expect(h3).toBe('Something went wrong!');
   });
 });
 
