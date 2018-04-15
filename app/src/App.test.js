@@ -72,7 +72,6 @@ describe('on page load', () => {
         // margin: object,
       })
     }
-    expect(listItems.length).toBe(3);
     //*/
     expect(listItems.length).toBe(4);
   });
